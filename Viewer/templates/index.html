@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manga Viewer</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Modern, clean styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+        }
+
+        li {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 240px;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .manga-card-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #2c3e50;
+            max-width: 160px;
+        }
+
+        .manga-card-link:hover {
+            color: #667eea;
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .manga-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .manga-title {
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .manga-chapter {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        li img {
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            border-radius: 8px;
+        }
+
+        li:hover img {
+            transform: scale(1.05);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Add Manga Form Styles */
+        .add-manga-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-manga-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-btn {
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            min-height: 48px;
+        }
+
+        .add-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-title {
+            grid-column: 1 / -1;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .form-help {
+            grid-column: 1 / -1;
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            ul {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            ul {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            ul {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            li {
+                min-height: 200px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            ul {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            main {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Manga Viewer</h1>
+    </header>
+    <main>
+        <section id="new-series">
+            <h2>New Chapters</h2>
+        <!-- Make sure to include the cover images in the image folder for the respective mangas-->
+         <ul>
+             {% for title, last_chapter in seriesNew %}
+                 <li>
+                     <a href="{{ url_for('chapter_images', title=title, chapter=last_chapter) }}" class="manga-card-link">
+                         <img src="{{ url_for('static', filename=title.replace(' ', '_').lower() + '/cover.jpg') }}" 
+                              alt="{{ title }} cover" 
+                              onerror="this.style.display='none'"
+                              style="width: 100px; height: 130px; object-fit: cover; border-radius: 4px;">
+                         <div class="manga-info">
+                             <span class="manga-title">{{ title }}</span>
+                             <span class="manga-chapter">Chapter {{ last_chapter }}</span>
+                         </div>
+                     </a>
+                 </li>
+             {% endfor %}
+         </ul>
+
+        </section>
+        <section id="old-series">
+            <h2>Old Chapters</h2>
+            <ul>
+                {% for title, last_chapter in seriesOld %}
+                    <li>
+                        <a href="{{ url_for('chapter_images', title=title, chapter=last_chapter) }}" class="manga-card-link">
+                            <img src="{{ url_for('static', filename=title.replace(' ', '_').lower() + '/cover.jpg') }}" 
+                                 alt="{{ title }} cover" 
+                                 onerror="this.style.display='none'"
+                                 style="width: 100px; height: 130px; object-fit: cover; border-radius: 4px;">
+                            <div class="manga-info">
+                                <span class="manga-title">{{ title }}</span>
+                                <span class="manga-chapter">Chapter {{ last_chapter }}</span>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+    
+    {% if scraping_in_progress %}
+    <div id="scraping-indicator" style="position: fixed; top: 20px; right: 20px; background: rgba(102, 126, 234, 0.9); color: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); z-index: 1000;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 20px; height: 20px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <span>Checking for new chapters...</span>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <script>
+        // Check scraping status and refresh when complete
+        function checkScrapingStatus() {
+            fetch('/api/scraping-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.scraping_in_progress) {
+                        // Scraping completed, refresh the page to show new chapters
+                        window.location.reload();
+                    } else {
+                        // Check again in 3 seconds
+                        setTimeout(checkScrapingStatus, 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking scraping status:', error);
+                    setTimeout(checkScrapingStatus, 5000);
+                });
+        }
+        
+        // Start checking scraping status
+        checkScrapingStatus();
+    </script>
+    {% endif %}
+</body>
+</html>

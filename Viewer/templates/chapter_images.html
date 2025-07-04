@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }} - Chapter {{ chapter }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        /* Modern, clean styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e0dfd5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #5a6fd8;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .chapter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-image {
+            width: auto;
+            max-width: 95vw;
+            max-height: 1360px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            background: white;
+            object-fit: contain;
+        }
+
+        .page-number {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .navigation.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Loading placeholder */
+        .loading-placeholder {
+            width: 100%;
+            max-width: 700px;
+            height: 900px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 12px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            header {
+                padding: 1rem 0;
+            }
+            
+            .navigation {
+                bottom: 10px;
+                gap: 0.5rem;
+            }
+            
+            .nav-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ title }} - Chapter {{ chapter }}</h1>
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Series</a>
+    </header>
+    
+    <main>
+        <div class="chapter-container">
+            {% for image in images %}
+                <img src="{{ url_for('static', filename=title.replace(' ', '_').lower() + '/chapter-' + chapter|string + '/' + image) }}" 
+                     alt="Page {{ loop.index }}" 
+                     class="page-image"
+                     loading="lazy"
+                     onerror="this.style.display='none'">
+            {% endfor %}
+        </div>
+    </main>
+
+    <div class="navigation">
+        <a href="{{ url_for('chapters', title=title) }}" class="nav-btn">← Chapter List</a>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="nav-btn">↑ Top</button>
+        <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="nav-btn">↓ Bottom</button>
+    </div>
+
+    <script>
+        // Smooth scroll for better reading experience
+        document.addEventListener('DOMContentLoaded', function() {
+            const navigation = document.querySelector('.navigation');
+            
+            // Show/hide navigation based on scroll position
+            function updateNavigationVisibility() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                
+                // Show navigation when within 500px of the bottom
+                const isNearBottom = scrollTop + windowHeight >= documentHeight - 500;
+                
+                if (isNearBottom) {
+                    navigation.classList.add('visible');
+                } else {
+                    navigation.classList.remove('visible');
+                }
+            }
+            
+            // Check on scroll
+            window.addEventListener('scroll', updateNavigationVisibility);
+            
+            // Initial check
+            updateNavigationVisibility();
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'w') {
+                    window.scrollBy({top: -200, behavior: 'smooth'});
+                }
+                if (e.key === 'ArrowDown' || e.key === 's') {
+                    window.scrollBy({top: 200, behavior: 'smooth'});
+                }
+                if (e.key === 'Home') {
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                }
+                if (e.key === 'End') {
+                    window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+                }
+            });
+
+            // Lazy loading fallback for older browsers
+            const images = document.querySelectorAll('.page-image');
+            images.forEach(img => {
+                img.addEventListener('load', function() {
+                    this.style.opacity = '1';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

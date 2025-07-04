@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ series }} - Chapters</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        /* Modern, clean styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e9ecef;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #5a6fd8;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .chapter-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .chapter-link {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .chapter-link:hover {
+            color: #667eea;
+        }
+
+        .chapter-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter-title {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .no-chapters {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            main {
+                padding: 0 1rem;
+            }
+            
+            .chapters-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ series }}</h1>
+        <p style="color: #666; font-size: 1.1rem; margin-bottom: 1rem;">Available Chapters</p>
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+    </header>
+    
+    <main>
+        {% if chapters %}
+            <div class="chapters-grid">
+                {% for chapter in chapters %}
+                    <div class="chapter-card">
+                        <div class="chapter-number">{{ chapter[0] }}</div>
+                        <div class="chapter-title">Chapter {{ chapter[0] }}</div>
+                        <a href="{{ url_for('chapter_images', title=series, chapter=chapter[0]) }}" 
+                           class="chapter-link">Read Chapter</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-chapters">
+                <h2>No chapters available for {{ series }}</h2>
+                <p>Check back later for updates!</p>
+            </div>
+        {% endif %}
+    </main>
+</body>
+</html>
