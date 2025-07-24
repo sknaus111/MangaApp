@@ -16,56 +16,47 @@ import os
 
 def check_for_updates():
     
-    conn = sqlite3.connect('manga.db')
+    conn = sqlite3.connect(os.environ.get('DATABASE_URL', 'manga.db'))
     cursor = conn.cursor()
 
     # Fetch all mangas
-    cursor.execute("SELECT title, url_scheme, last_chapter FROM mangas")
+    # fix sql statement to use UNIQUE
+    cursor.execute("SELECT DISTINCT title FROM chapters")
     mangas = cursor.fetchall()
+    mangas = [manga[0] for manga in mangas]
 
     for manga in mangas:
-        title, url_scheme, last_chapter = manga
-        print(f"Checking updates for {title}...")
+        cursor.execute("SELECT MAX(chapter_number),url FROM chapters WHERE title = ?",(manga,))
+        chapter, url = cursor.fetchall()[0]
 
-        new_chapter_number = last_chapter + 1
-        new_chapter_url = url_scheme.replace("####", str(new_chapter_number))
+        while True:
+            chapter = chapter + 1
+            url = url.replace(str(chapter-1), str(chapter))
 
-        print(f"Checking URL: {new_chapter_url}")
-        response = requests.get(new_chapter_url)
+            response = requests.get(url)
 
-        # check if the link didnt redirecct to the start page "https://ww2.mangafreak.me/"
-        print(f"Response URL: {response.url}")
-        if response.url == "https://ww2.mangafreak.me":
-            print(f"No new chapter found for {title}. Redirected to start page.")
-            continue
+            if response.status_code != 200:
+                break
+            if response.url != url:
+                break
 
-        if response.status_code != 200:
-            print(f"No new chapter found for {title}. Status code: {response.status_code}")
-            continue
-
-        scrape(new_chapter_url,new_chapter_number,title,cursor)
-
-        cursor.execute("UPDATE mangas SET last_chapter = ?, new = 1 WHERE title = ?", (new_chapter_number, title))
+            scrape(response,url,chapter,manga,cursor)
 
     conn.commit()
     conn.close()
 
-def scrape(url: str, chapter: int,title : str, cursor: sqlite3.Cursor):
+def scrape(response: requests.Response, url: str, chapter: int, title: str, cursor: sqlite3.Cursor):
     """
-    Scrape the chapter page from the given url.
+    Scrape all images of a given response
     """    
-    session = requests.Session()
-    response = session.get(url)
-
-    if response.status_code != 200:
-        print(f"Failed to retrieve chapter page: {response.status_code}")
-        return
-
+    
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    images = soup.find_all('img', src=lambda x: x and x.endswith('.jpg'))
-    
-    folder_name = f"images/{title.replace(' ', '_').lower()}/chapter-{chapter}" 
+    # change images to find manga images of all possible image types but
+    images = soup.find_all('img', src=lambda x: x and x.endswith(('.jpg', '.jpeg', '.png', '.gif')))
+
+    print(f"Title: {title}, Chapter: {chapter}, URL: {url}")
+    folder_name = f"images/{title.replace(' ', '_').lower()}/chapter-{chapter}"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
 
@@ -73,11 +64,11 @@ def scrape(url: str, chapter: int,title : str, cursor: sqlite3.Cursor):
         img_url = img.get('src')
         save_image(img_url, folder_name)
 
-    cursor.execute("INSERT INTO chapters (id, title, folder ,new) VALUES (?, ?,?,?)", (chapter, title,folder_name,True))
+    cursor.execute("INSERT INTO chapters (chapter_number, title, url ,new) VALUES (?, ?,?,?)", (chapter, title,url,True))
 
 def save_image(img_url: str, folder: str):
     """
-    Save the image to the local folder images. First create a new folder for the respective chapter and then save the image there.
+    Save the image to the local folder images.
     """
     response = requests.get(img_url)
     if response.status_code == 200:
@@ -87,8 +78,41 @@ def save_image(img_url: str, folder: str):
     else:
         print(f"Failed to retrieve image: {response.status_code}")
 
+def delete_chapter(title: str, chapter: int, cursor: sqlite3.Cursor):
+    """
+    Delete a chapter from the database.
+    """
+    cursor.execute("DELETE FROM chapters WHERE title = ? AND chapter_number = ?", (title, chapter))
+
+    folder_name = f"images/{title.replace(' ', '_').lower()}/chapter-{chapter}"
+    if os.path.exists(folder_name):
+        for filename in os.listdir(folder_name):
+            file_path = os.path.join(folder_name, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        os.rmdir(folder_name)
+
+
+def delete_old_chapters():
+    """
+    Delete chapters that are not marked as new.
+    """
+    conn = sqlite3.connect(os.environ.get('DATABASE_URL', 'manga.db'))
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM chapters WHERE new = 0")
+    old_chapters = cursor.fetchall()
+
+    for chapter in old_chapters:
+        delete_chapter(chapter[1], chapter[0], cursor)
+
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
-    check_for_updates()
+    #check_for_updates()
+    delete_old_chapters()
     print("Update check completed.")
-    
+
+
     

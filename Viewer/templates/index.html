@@ -28,6 +28,7 @@
             text-align: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
+            position: relative;
         }
 
         h1 {
@@ -35,6 +36,191 @@
             font-weight: 700;
             color: #2c3e50;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .add-manga-trigger {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-manga-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #667eea;
+        }
+
+        .add-manga-form {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            padding: 0.8rem;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+            line-height: 1.3;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .cancel-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 2px solid rgba(108, 117, 125, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(108, 117, 125, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Modal Responsive Design */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 5% auto;
+                width: 95%;
+            }
+            
+            .modal-header {
+                padding: 1rem 1.5rem;
+            }
+            
+            .add-manga-form {
+                padding: 1.5rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .cancel-btn,
+            .submit-btn {
+                width: 100%;
+            }
         }
 
         main {
@@ -61,6 +247,11 @@
 
         ul {
             list-style: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
@@ -68,21 +259,21 @@
         }
 
         li {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
+            background: transparent;
+            border-radius: 12px;
+            padding: 1rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 240px;
+            min-height: 200px;
             transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
         li:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: rgba(102, 126, 234, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
         }
 
         .manga-card-link {
@@ -140,86 +331,6 @@
             color: inherit;
         }
 
-        /* Add Manga Form Styles */
-        .add-manga-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .add-manga-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            align-items: end;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .form-group input {
-            padding: 0.75rem;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            background: white;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .add-btn {
-            padding: 0.75rem 1.5rem;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            min-height: 48px;
-        }
-
-        .add-btn:hover {
-            background: #5a6fd8;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .form-title {
-            grid-column: 1 / -1;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .form-help {
-            grid-column: 1 / -1;
-            font-size: 0.85rem;
-            color: #666;
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-
         /* Responsive design */
         @media (max-width: 1200px) {
             ul {
@@ -261,7 +372,37 @@
 <body>
     <header>
         <h1>Manga Viewer</h1>
+        <button id="add-manga-btn" class="add-manga-trigger">+ Add New Manga</button>
     </header>
+
+    <!-- Modal for adding manga -->
+    <div id="add-manga-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Manga</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form method="POST" action="/add-manga" class="add-manga-form">
+                <div class="form-group">
+                    <label for="title">Manga Title</label>
+                    <input type="text" id="title" name="title" placeholder="Enter manga title" required>
+                </div>
+                <div class="form-group">
+                    <label for="latest_chapter">Latest Chapter</label>
+                    <input type="number" id="latest_chapter" name="latest_chapter" placeholder="Chapter number" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="url_scheme">URL Pattern</label>
+                    <input type="url" id="url_scheme" name="url_scheme" placeholder="https://example.com/manga-title-####" required>
+                    <small>Use #### as placeholder for chapter number</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Add Manga</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <main>
         <section id="new-series">
             <h2>New Chapters</h2>

@@ -1,0 +1,3 @@
+# Add these to requirements.txt for S3 support
+boto3==1.34.0
+python-dotenv==1.0.0
